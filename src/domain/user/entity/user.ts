@@ -3,13 +3,15 @@ import type Email from '../value-object/email.js';
 
 export default class User {
   private _id: string;
+  private _name: string;
   private _email: Email;
   private _passwordHash: string;
   private _active: boolean = false;
   private _roles: Role[] = [];
 
-  constructor(id: string, email: Email, passwordHash: string) {
+  constructor(id: string, name: string, email: Email, passwordHash: string) {
     this._id = id;
+    this._name = name;
     this._email = email;
     this._passwordHash = passwordHash;
     this.validate();
@@ -18,6 +20,9 @@ export default class User {
   validate(): void {
     if (!this._id) {
       throw new Error('ID is required');
+    }
+    if (!this._name) {
+      throw new Error('Name is required');
     }
     if (!this._email) {
       throw new Error('Email is required');
