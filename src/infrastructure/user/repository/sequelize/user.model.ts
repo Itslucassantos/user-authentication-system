@@ -1,5 +1,16 @@
-import { Column, Default, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import {
+  BelongsToMany,
+  Column,
+  Default,
+  HasMany,
+  Model,
+  PrimaryKey,
+  Table,
+} from 'sequelize-typescript';
 import RoleModel from '../../../role/repository/sequelize/role.model.js';
+import RefreshTokenModel from '../../../auth/repository/sequelize/refresh-token.js';
+import PasswordTokenModel from '../../../auth/repository/sequelize/password-token.js';
+import UserRoleModel from './user-role.model.js';
 
 @Table({
   tableName: 'users',
@@ -22,8 +33,14 @@ export default class UserModel extends Model {
   @Default(false)
   declare active: boolean;
 
-  @HasMany(() => RoleModel)
+  @BelongsToMany(() => RoleModel, () => UserRoleModel)
   declare roles: RoleModel[];
+
+  @HasMany(() => RefreshTokenModel)
+  declare refreshTokens: RefreshTokenModel[];
+
+  @HasMany(() => PasswordTokenModel)
+  declare passwordTokens: PasswordTokenModel[];
 
   @Column
   declare createdAt: Date;

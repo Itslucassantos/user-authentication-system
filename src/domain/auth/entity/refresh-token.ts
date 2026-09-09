@@ -48,4 +48,8 @@ export default class RefreshToken {
   revoke(): void {
     this._revoked = true;
   }
+
+  isExpired(): boolean {
+    return this._expiresAt <= new Date();
+  }
 }
