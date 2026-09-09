@@ -7,16 +7,16 @@ import RefreshTokenModel from '../../../auth/repository/sequelize/refresh-token.
 })
 export default class ClientApplicationModel extends Model {
   @PrimaryKey
-  @Column
+  @Column(DataType.STRING)
   declare id: string;
 
-  @Column({ allowNull: false })
+  @Column({ type: DataType.STRING, allowNull: false })
   declare name: string;
 
-  @Column({ allowNull: false })
+  @Column({ type: DataType.STRING, allowNull: false })
   declare clientId: string;
 
-  @Column({ allowNull: false })
+  @Column({ type: DataType.STRING, allowNull: false })
   declare clientSecretHash: string;
 
   @Column({
@@ -25,8 +25,8 @@ export default class ClientApplicationModel extends Model {
   })
   declare redirectUris: string[];
 
-  @Column
   @Default(true)
+  @Column(DataType.BOOLEAN)
   declare active: boolean;
 
   @HasMany(() => RoleModel)
@@ -35,9 +35,9 @@ export default class ClientApplicationModel extends Model {
   @HasMany(() => RefreshTokenModel)
   declare refreshTokens: RefreshTokenModel[];
 
-  @Column
+  @Column(DataType.DATE)
   declare createdAt: Date;
 
-  @Column
+  @Column(DataType.DATE)
   declare updatedAt: Date;
 }

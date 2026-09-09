@@ -1,4 +1,12 @@
-import { BelongsTo, Column, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import {
+  BelongsTo,
+  Column,
+  DataType,
+  ForeignKey,
+  Model,
+  PrimaryKey,
+  Table,
+} from 'sequelize-typescript';
 import UserModel from '../../../user/repository/sequelize/user.model.js';
 import ClientApplicationModel from '../../../client-application/repository/sequelize/client-application.model.js';
 
@@ -7,38 +15,38 @@ import ClientApplicationModel from '../../../client-application/repository/seque
 })
 export default class RefreshToken extends Model {
   @PrimaryKey
-  @Column
+  @Column(DataType.STRING)
   declare id: string;
 
   @ForeignKey(() => UserModel)
-  @Column({ allowNull: false })
+  @Column({ type: DataType.STRING, allowNull: false })
   declare userId: string;
 
   @BelongsTo(() => UserModel)
   declare user: UserModel;
 
   @ForeignKey(() => ClientApplicationModel)
-  @Column({ allowNull: false })
+  @Column({ type: DataType.STRING, allowNull: false })
   declare clientApplicationId: string;
 
   @BelongsTo(() => ClientApplicationModel)
   declare clientApplication: ClientApplicationModel;
 
-  @Column({ allowNull: false })
+  @Column({ type: DataType.STRING, allowNull: false })
   declare tokenHash: string;
 
-  @Column({ allowNull: false })
+  @Column({ type: DataType.STRING, allowNull: false })
   declare deviceInfo: string;
 
-  @Column({ allowNull: false, defaultValue: false })
+  @Column({ type: DataType.BOOLEAN, allowNull: false, defaultValue: false })
   declare revoked: boolean;
 
-  @Column({ allowNull: false })
+  @Column({ type: DataType.DATE, allowNull: false })
   declare expiresAt: Date;
 
-  @Column
+  @Column(DataType.DATE)
   declare createdAt: Date;
 
-  @Column
+  @Column(DataType.DATE)
   declare updatedAt: Date;
 }

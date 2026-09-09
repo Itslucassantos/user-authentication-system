@@ -2,6 +2,7 @@ import {
   BelongsTo,
   BelongsToMany,
   Column,
+  DataType,
   ForeignKey,
   Model,
   PrimaryKey,
@@ -18,20 +19,20 @@ import UserRoleModel from '../../../user/repository/sequelize/user-role.model.js
 })
 export default class RoleModel extends Model {
   @PrimaryKey
-  @Column
+  @Column(DataType.STRING)
   declare id: string;
 
   @ForeignKey(() => ClientApplicationModel)
-  @Column({ allowNull: false, field: 'client_application_id' })
+  @Column({ type: DataType.STRING, allowNull: false, field: 'client_application_id' })
   declare clientApplicationId: string;
 
   @BelongsTo(() => ClientApplicationModel)
   declare clientApplication: ClientApplicationModel;
 
-  @Column({ allowNull: false })
+  @Column({ type: DataType.STRING, allowNull: false })
   declare name: string;
 
-  @Column({ allowNull: false })
+  @Column({ type: DataType.STRING, allowNull: false })
   declare description: string;
 
   @BelongsToMany(() => PermissionModel, () => RolePermissionModel)
@@ -40,9 +41,9 @@ export default class RoleModel extends Model {
   @BelongsToMany(() => UserModel, () => UserRoleModel)
   declare users: UserModel[];
 
-  @Column
+  @Column(DataType.DATE)
   declare createdAt: Date;
 
-  @Column
+  @Column(DataType.DATE)
   declare updatedAt: Date;
 }
