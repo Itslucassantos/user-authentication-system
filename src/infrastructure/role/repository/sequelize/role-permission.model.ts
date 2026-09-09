@@ -1,4 +1,12 @@
-import { BelongsTo, Column, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import {
+  BelongsTo,
+  Column,
+  DataType,
+  ForeignKey,
+  Model,
+  PrimaryKey,
+  Table,
+} from 'sequelize-typescript';
 import PermissionModel from './permission.model.js';
 import RoleModel from './role.model.js';
 
@@ -9,12 +17,12 @@ import RoleModel from './role.model.js';
 export default class RolePermissionModel extends Model {
   @PrimaryKey
   @ForeignKey(() => RoleModel)
-  @Column({ field: 'role_id' })
+  @Column({ type: DataType.STRING, field: 'role_id' })
   declare roleId: string;
 
   @PrimaryKey
   @ForeignKey(() => PermissionModel)
-  @Column({ field: 'permission_id' })
+  @Column({ type: DataType.STRING, field: 'permission_id' })
   declare permissionId: string;
 
   @BelongsTo(() => RoleModel)

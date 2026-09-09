@@ -1,6 +1,7 @@
 import {
   BelongsToMany,
   Column,
+  DataType,
   Default,
   HasMany,
   Model,
@@ -17,20 +18,20 @@ import UserRoleModel from './user-role.model.js';
 })
 export default class UserModel extends Model {
   @PrimaryKey
-  @Column
+  @Column(DataType.STRING)
   declare id: string;
 
-  @Column({ allowNull: false })
+  @Column({ type: DataType.STRING, allowNull: false })
   declare name: string;
 
-  @Column({ allowNull: false })
+  @Column({ type: DataType.STRING, allowNull: false })
   declare email: string;
 
-  @Column({ allowNull: false })
+  @Column({ type: DataType.STRING, allowNull: false })
   declare passwordHash: string;
 
-  @Column
   @Default(false)
+  @Column(DataType.BOOLEAN)
   declare active: boolean;
 
   @BelongsToMany(() => RoleModel, () => UserRoleModel)
@@ -42,9 +43,9 @@ export default class UserModel extends Model {
   @HasMany(() => PasswordTokenModel)
   declare passwordTokens: PasswordTokenModel[];
 
-  @Column
+  @Column(DataType.DATE)
   declare createdAt: Date;
 
-  @Column
+  @Column(DataType.DATE)
   declare updatedAt: Date;
 }

@@ -15,11 +15,11 @@ import { PasswordTokenType } from '../../../../domain/auth/enum/password-token-t
 })
 export default class PasswordToken extends Model {
   @PrimaryKey
-  @Column
+  @Column(DataType.STRING)
   declare id: string;
 
   @ForeignKey(() => UserModel)
-  @Column({ allowNull: false })
+  @Column({ type: DataType.STRING, allowNull: false })
   declare userId: string;
 
   @BelongsTo(() => UserModel)
@@ -31,18 +31,18 @@ export default class PasswordToken extends Model {
   })
   declare type: PasswordTokenType;
 
-  @Column({ allowNull: false })
+  @Column({ type: DataType.STRING, allowNull: false })
   declare tokenHash: string;
 
-  @Column({ allowNull: false, defaultValue: false })
+  @Column({ type: DataType.BOOLEAN, allowNull: false, defaultValue: false })
   declare used: boolean;
 
-  @Column({ allowNull: false })
+  @Column({ type: DataType.DATE, allowNull: false })
   declare expiresAt: Date;
 
-  @Column
+  @Column(DataType.DATE)
   declare createdAt: Date;
 
-  @Column
+  @Column(DataType.DATE)
   declare updatedAt: Date;
 }
