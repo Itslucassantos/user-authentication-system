@@ -1,14 +1,17 @@
 import {
   BelongsTo,
+  BelongsToMany,
   Column,
   ForeignKey,
-  HasMany,
   Model,
   PrimaryKey,
   Table,
 } from 'sequelize-typescript';
 import PermissionModel from './permission.model.js';
 import ClientApplicationModel from '../../../client-application/repository/sequelize/client-application.model.js';
+import UserModel from '../../../user/repository/sequelize/user.model.js';
+import RolePermissionModel from './role-permission.model.js';
+import UserRoleModel from '../../../user/repository/sequelize/user-role.model.js';
 
 @Table({
   tableName: 'roles',
@@ -28,11 +31,14 @@ export default class RoleModel extends Model {
   @Column({ allowNull: false })
   declare name: string;
 
-  @Column({ allowNull: true })
+  @Column({ allowNull: false })
   declare description: string;
 
-  @HasMany(() => PermissionModel)
+  @BelongsToMany(() => PermissionModel, () => RolePermissionModel)
   declare permissions: PermissionModel[];
+
+  @BelongsToMany(() => UserModel, () => UserRoleModel)
+  declare users: UserModel[];
 
   @Column
   declare createdAt: Date;
