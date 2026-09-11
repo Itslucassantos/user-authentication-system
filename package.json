@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "node dist/main.js",
-    "dev": "ts-node-dev --respawn --transpile-only src/main.ts",
+    "dev": "tsx watch src/main.ts",
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
@@ -17,7 +17,11 @@
     "format:check": "prettier . --check",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage --passWithNoTests"
+    "test:coverage": "jest --coverage --passWithNoTests",
+    "migrate": "tsx src/infrastructure/database/migrate.ts up",
+    "migrate:down": "tsx src/infrastructure/database/migrate.ts down",
+    "migrate:pending": "tsx src/infrastructure/database/migrate.ts pending",
+    "migrate:executed": "tsx src/infrastructure/database/migrate.ts executed"
   },
   "repository": {
     "type": "git",
@@ -36,7 +40,10 @@
     "express": "^5.2.1",
     "pg": "^8.23.0",
     "pg-hstore": "^2.3.4",
-    "sequelize": "^6.37.8"
+    "reflect-metadata": "^0.2.2",
+    "sequelize": "^6.37.8",
+    "sequelize-typescript": "^2.1.6",
+    "umzug": "^3.8.3"
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
@@ -54,6 +61,7 @@
     "prettier": "^3.9.6",
     "supertest": "^7.2.2",
     "ts-node-dev": "^2.0.0",
+    "tsx": "^4.23.13",
     "typescript": "^7.0.2"
   }
 }
