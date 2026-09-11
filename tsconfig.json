@@ -10,6 +10,7 @@
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
+    "experimentalDecorators": true,
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
