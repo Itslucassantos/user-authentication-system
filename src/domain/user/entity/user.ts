@@ -17,6 +17,30 @@ export default class User {
     this.validate();
   }
 
+  get id(): string {
+    return this._id;
+  }
+
+  get name(): string {
+    return this._name;
+  }
+
+  get email(): Email {
+    return this._email;
+  }
+
+  get passwordHash(): string {
+    return this._passwordHash;
+  }
+
+  get active(): boolean {
+    return this._active;
+  }
+
+  get roles(): Role[] {
+    return [...this._roles];
+  }
+
   validate(): void {
     if (!this._id) {
       throw new Error('ID is required');
