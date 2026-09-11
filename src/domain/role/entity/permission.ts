@@ -14,6 +14,14 @@ export default class Permission {
     this.validate();
   }
 
+  get resource(): string {
+    return this._resource;
+  }
+
+  get action(): string {
+    return this._action;
+  }
+
   validate(): void {
     if (!this._id) {
       throw new Error('Permission ID is required');
