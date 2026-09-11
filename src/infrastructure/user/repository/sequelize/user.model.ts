@@ -27,7 +27,8 @@ export default class UserModel extends Model {
   @Column({ type: DataType.STRING, allowNull: false })
   declare email: string;
 
-  @Column({ type: DataType.STRING, allowNull: false })
+  @Column({ type: DataType.STRING})
+  @Default(null)
   declare passwordHash: string;
 
   @Default(false)
