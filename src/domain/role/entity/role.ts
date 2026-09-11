@@ -22,6 +22,10 @@ export default class Role {
     this.validate();
   }
 
+  get id(): string {
+    return this._id;
+  }
+
   validate(): void {
     if (!this._id) {
       throw new Error('Role ID is required');
