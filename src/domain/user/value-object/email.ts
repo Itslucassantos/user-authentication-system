@@ -6,6 +6,10 @@ export default class Email {
     this.validateEmail(email);
   }
 
+  get value(): string {
+    return this._email;
+  }
+
   private validateEmail(email: string): void {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!regex.test(email)) {
