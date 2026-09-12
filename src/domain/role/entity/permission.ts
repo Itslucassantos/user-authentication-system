@@ -40,4 +40,8 @@ export default class Permission {
   changeDescription(description?: string): void {
     this._description = description ?? '';
   }
+
+  matches(resource: string, action: string): boolean {
+    return this._resource === resource && this._action === action;
+  }
 }
