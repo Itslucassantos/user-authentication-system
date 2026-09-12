@@ -72,9 +72,8 @@ export default class User {
     this.validate();
   }
 
-  changeRoles(roles: Role[]): void {
+  setRoles(roles: Role[]): void {
     this._roles = roles ?? [];
-    this.validate();
   }
 
   hasPermission(resource: string, action: string, clientApplicationId: string): boolean {
@@ -83,9 +82,5 @@ export default class User {
 
   rolesFor(clientApplicationId: string): Role[] {
     return this._roles.filter(role => role.clientApplicationId === clientApplicationId);
-  }
-
-  isActive(): boolean {
-    return this._active;
   }
 }

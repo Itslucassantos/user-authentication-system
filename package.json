@@ -36,6 +36,7 @@
   },
   "homepage": "https://github.com/Itslucassantos/user-authentication-system#readme",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "pg": "^8.23.0",
@@ -43,13 +44,15 @@
     "reflect-metadata": "^0.2.2",
     "sequelize": "^6.37.8",
     "sequelize-typescript": "^2.1.6",
-    "umzug": "^3.8.3"
+    "umzug": "^3.8.3",
+    "uuid": "^14.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
     "@babel/preset-env": "^7.29.7",
     "@babel/preset-typescript": "^7.29.7",
     "@eslint/js": "^10.0.1",
+    "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
     "@types/node": "^26.4.1",

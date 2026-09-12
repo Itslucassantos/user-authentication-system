@@ -1,4 +1,4 @@
-import type User from '../../../../domain/user/entity/user.js';
+import User from '../../../../domain/user/entity/user.js';
 
 export default class UserMapper {
   static toPersistence(entity: User) {
