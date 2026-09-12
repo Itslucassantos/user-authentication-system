@@ -30,6 +30,18 @@ export default class Role {
     return this._clientApplicationId;
   }
 
+  get name(): string {
+    return this._name;
+  }
+
+  get description(): string {
+    return this._description;
+  }
+
+  get permissions(): Permission[] {
+    return this._permissions;
+  }
+
   validate(): void {
     if (!this._id) {
       throw new Error('Role ID is required');

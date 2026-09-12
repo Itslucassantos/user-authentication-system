@@ -43,4 +43,34 @@ export default class ClientApplication {
       throw new Error('At least one redirect URI is required');
     }
   }
+
+  activate(): void {
+    this._active = true;
+  }
+
+  deactivate(): void {
+    this._active = false;
+  }
+
+  rotateClientSecret(newClientSecretHash: string): void {
+    this._clientSecretHash = newClientSecretHash;
+  }
+
+  addRedirectUri(redirectUri: string): void {
+    if (!this._redirectUris.includes(redirectUri)) {
+      this._redirectUris.push(redirectUri);
+    }
+  }
+
+  removeRedirectUri(redirectUri: string): void {
+    const remaining = this._redirectUris.filter(uri => uri !== redirectUri);
+    if (remaining.length === 0) {
+      throw new Error('At least one redirect URI is required');
+    }
+    this._redirectUris = remaining;
+  }
+
+  hasRedirectUri(redirectUri: string): boolean {
+    return this._redirectUris.includes(redirectUri);
+  }
 }
