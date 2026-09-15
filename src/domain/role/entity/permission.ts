@@ -14,6 +14,10 @@ export default class Permission {
     this.validate();
   }
 
+  get id(): string {
+    return this._id;
+  }
+
   get resource(): string {
     return this._resource;
   }
