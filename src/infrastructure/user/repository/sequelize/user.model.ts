@@ -9,7 +9,6 @@ import {
   Table,
 } from 'sequelize-typescript';
 import RoleModel from '../../../role/repository/sequelize/role.model.js';
-import RefreshTokenModel from '../../../auth/repository/sequelize/refresh-token.js';
 import PasswordTokenModel from '../../../auth/repository/sequelize/password-token.js';
 import UserRoleModel from './user-role.model.js';
 
@@ -37,9 +36,6 @@ export default class UserModel extends Model {
 
   @BelongsToMany(() => RoleModel, () => UserRoleModel)
   declare roles: RoleModel[];
-
-  @HasMany(() => RefreshTokenModel)
-  declare refreshTokens: RefreshTokenModel[];
 
   @HasMany(() => PasswordTokenModel)
   declare passwordTokens: PasswordTokenModel[];
