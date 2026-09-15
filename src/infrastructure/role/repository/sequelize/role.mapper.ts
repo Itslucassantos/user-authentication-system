@@ -10,7 +10,6 @@ export default class RoleMapper {
             clientApplicationId: entity.clientApplicationId,
             name: entity.name,
             description: entity.description,
-            permissions: entity.permissions,
         };
     }
 
