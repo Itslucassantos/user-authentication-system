@@ -4,6 +4,7 @@ import type UserRepositoryInterface from '../../../../domain/user/repository/use
 import type { PaginatedResult, PaginationParams } from '../../../../domain/@shared/repository/pagination.js';
 import RepositoryError from '../../../../domain/@shared/error/repository-error.js';
 import UserAlreadyExistsError from '../../../../domain/user/error/user-already-exists-error.js';
+import UserNotFoundError from '../../../../domain/user/error/user-not-found-error.js';
 import Email from '../../../../domain/user/value-object/email.js';
 import { sequelize } from '../../../database/sequelize.js';
 import UserModel from './user.model.js';
@@ -69,7 +70,7 @@ export default class UserRepository implements UserRepositoryInterface {
                     transaction,
                 });
                 if (affectedCount === 0) {
-                    throw new Error(`User with id "${entity.id}" not found`);
+                    throw new UserNotFoundError(entity.id);
                 }
                 const model = await UserModel.findByPk(entity.id, { transaction, rejectOnEmpty: true });
                 await model.$set(
@@ -79,6 +80,9 @@ export default class UserRepository implements UserRepositoryInterface {
                 );
             });
         } catch (error) {
+            if (error instanceof UserNotFoundError) {
+                throw error;
+            }
             if (error instanceof UniqueConstraintError) {
                 throw new UserAlreadyExistsError(entity.email.value);
             }
@@ -89,9 +93,12 @@ export default class UserRepository implements UserRepositoryInterface {
         try {
             const deletedCount = await UserModel.destroy({ where: { id } });
             if (deletedCount === 0) {
-                throw new Error(`User with id "${id}" not found`);
+                throw new UserNotFoundError(id);
             }
         } catch (error) {
+            if (error instanceof UserNotFoundError) {
+                throw error;
+            }
             throw new RepositoryError('Failed to delete user', error);
         }
     }
