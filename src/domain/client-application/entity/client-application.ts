@@ -5,7 +5,7 @@ export default class ClientApplication {
   private _name: string;
   private _clientId: string;
   private _clientSecretHash: string;
-  private _redirectUris: string[] = [];
+  private _redirectUris: string[];
   private _active: boolean = true;
   private _roles: Role[] = [];
 
@@ -21,9 +21,37 @@ export default class ClientApplication {
     this._name = name;
     this._clientId = clientId;
     this._clientSecretHash = clientSecretHash;
-    this._redirectUris = redirectUris ?? [];
+    this._redirectUris = redirectUris;
     this._roles = roles ?? [];
     this.validate();
+  }
+
+  get id(): string {
+    return this._id;
+  }
+
+  get name(): string {
+    return this._name;
+  }
+
+  get clientId(): string {
+    return this._clientId;
+  }
+
+  get clientSecretHash(): string {
+    return this._clientSecretHash;
+  }
+
+  get redirectUris(): string[] {
+    return this._redirectUris;
+  }
+
+  get active(): boolean {
+    return this._active;
+  }
+
+  get roles(): Role[] {
+    return this._roles;
   }
 
   validate(): void {
