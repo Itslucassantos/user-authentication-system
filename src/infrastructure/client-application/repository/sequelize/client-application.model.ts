@@ -9,7 +9,7 @@ export default class ClientApplicationModel extends Model {
   @Column(DataType.STRING)
   declare id: string;
 
-  @Column({ type: DataType.STRING, allowNull: false })
+  @Column({ type: DataType.STRING, allowNull: false, unique: true })
   declare name: string;
 
   @Column({ type: DataType.STRING, allowNull: false })
