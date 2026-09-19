@@ -77,10 +77,10 @@ export default class User {
   }
 
   hasPermission(resource: string, action: string, clientApplicationId: string): boolean {
-    return this.rolesFor(clientApplicationId).some(role => role.hasPermission(resource, action));
+    return this.rolesFor(clientApplicationId).some((role) => role.hasPermission(resource, action));
   }
 
   rolesFor(clientApplicationId: string): Role[] {
-    return this._roles.filter(role => role.clientApplicationId === clientApplicationId);
+    return this._roles.filter((role) => role.clientApplicationId === clientApplicationId);
   }
 }
