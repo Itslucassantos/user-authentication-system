@@ -52,4 +52,8 @@ export default class RefreshToken {
   isExpired(): boolean {
     return this._expiresAt <= new Date();
   }
+
+  isValid(): boolean {
+    return !this._revoked && !this.isExpired();
+  }
 }

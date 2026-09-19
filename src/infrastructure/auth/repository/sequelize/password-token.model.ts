@@ -8,12 +8,12 @@ import {
   Table,
 } from 'sequelize-typescript';
 import UserModel from '../../../user/repository/sequelize/user.model.js';
-import ClientApplicationModel from '../../../client-application/repository/sequelize/client-application.model.js';
+import { PasswordTokenType } from '../../../../domain/auth/enum/password-token-type.enum.js';
 
 @Table({
-  tableName: 'refresh_tokens',
+  tableName: 'password_tokens',
 })
-export default class RefreshToken extends Model {
+export default class PasswordTokenModel extends Model {
   @PrimaryKey
   @Column(DataType.STRING)
   declare id: string;
@@ -25,21 +25,17 @@ export default class RefreshToken extends Model {
   @BelongsTo(() => UserModel)
   declare user: UserModel;
 
-  @ForeignKey(() => ClientApplicationModel)
-  @Column({ type: DataType.STRING, allowNull: false })
-  declare clientApplicationId: string;
-
-  @BelongsTo(() => ClientApplicationModel)
-  declare clientApplication: ClientApplicationModel;
+  @Column({
+    type: DataType.ENUM(...Object.values(PasswordTokenType)),
+    allowNull: false,
+  })
+  declare type: PasswordTokenType;
 
   @Column({ type: DataType.STRING, allowNull: false })
   declare tokenHash: string;
 
-  @Column({ type: DataType.STRING, allowNull: false })
-  declare deviceInfo: string;
-
   @Column({ type: DataType.BOOLEAN, allowNull: false, defaultValue: false })
-  declare revoked: boolean;
+  declare used: boolean;
 
   @Column({ type: DataType.DATE, allowNull: false })
   declare expiresAt: Date;
