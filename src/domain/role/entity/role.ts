@@ -68,8 +68,8 @@ export default class Role {
   }
 
   hasPermission(resource: string, action: string): boolean {
-    return this._permissions.some(permission =>
-      permission.resource === resource && permission.action === action
+    return this._permissions.some(
+      (permission) => permission.resource === resource && permission.action === action,
     );
   }
 }
