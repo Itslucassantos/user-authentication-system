@@ -1,6 +1,5 @@
 import { Column, DataType, Default, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
 import RoleModel from '../../../role/repository/sequelize/role.model.js';
-import RefreshTokenModel from '../../../auth/repository/sequelize/refresh-token.js';
 
 @Table({
   tableName: 'client_applications',
@@ -10,7 +9,7 @@ export default class ClientApplicationModel extends Model {
   @Column(DataType.STRING)
   declare id: string;
 
-  @Column({ type: DataType.STRING, allowNull: false })
+  @Column({ type: DataType.STRING, allowNull: false, unique: true })
   declare name: string;
 
   @Column({ type: DataType.STRING, allowNull: false })
@@ -31,9 +30,6 @@ export default class ClientApplicationModel extends Model {
 
   @HasMany(() => RoleModel)
   declare roles: RoleModel[];
-
-  @HasMany(() => RefreshTokenModel)
-  declare refreshTokens: RefreshTokenModel[];
 
   @Column(DataType.DATE)
   declare createdAt: Date;

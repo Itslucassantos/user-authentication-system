@@ -6,8 +6,7 @@ import RoleModel from '../role/repository/sequelize/role.model.js';
 import PermissionModel from '../role/repository/sequelize/permission.model.js';
 import RolePermissionModel from '../role/repository/sequelize/role-permission.model.js';
 import ClientApplicationModel from '../client-application/repository/sequelize/client-application.model.js';
-import RefreshTokenModel from '../auth/repository/sequelize/refresh-token.js';
-import PasswordTokenModel from '../auth/repository/sequelize/password-token.js';
+import PasswordTokenModel from '../auth/repository/sequelize/password-token.model.js';
 
 try {
   process.loadEnvFile();
@@ -30,7 +29,6 @@ export const sequelize = new Sequelize({
     PermissionModel,
     RolePermissionModel,
     ClientApplicationModel,
-    RefreshTokenModel,
     PasswordTokenModel,
   ],
 });

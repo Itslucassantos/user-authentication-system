@@ -9,8 +9,7 @@ import {
   Table,
 } from 'sequelize-typescript';
 import RoleModel from '../../../role/repository/sequelize/role.model.js';
-import RefreshTokenModel from '../../../auth/repository/sequelize/refresh-token.js';
-import PasswordTokenModel from '../../../auth/repository/sequelize/password-token.js';
+import PasswordTokenModel from '../../../auth/repository/sequelize/password-token.model.js';
 import UserRoleModel from './user-role.model.js';
 
 @Table({
@@ -27,7 +26,8 @@ export default class UserModel extends Model {
   @Column({ type: DataType.STRING, allowNull: false })
   declare email: string;
 
-  @Column({ type: DataType.STRING, allowNull: false })
+  @Default(null)
+  @Column({ type: DataType.STRING })
   declare passwordHash: string;
 
   @Default(false)
@@ -36,9 +36,6 @@ export default class UserModel extends Model {
 
   @BelongsToMany(() => RoleModel, () => UserRoleModel)
   declare roles: RoleModel[];
-
-  @HasMany(() => RefreshTokenModel)
-  declare refreshTokens: RefreshTokenModel[];
 
   @HasMany(() => PasswordTokenModel)
   declare passwordTokens: PasswordTokenModel[];

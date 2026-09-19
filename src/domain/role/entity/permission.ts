@@ -14,6 +14,18 @@ export default class Permission {
     this.validate();
   }
 
+  get id(): string {
+    return this._id;
+  }
+
+  get resource(): string {
+    return this._resource;
+  }
+
+  get action(): string {
+    return this._action;
+  }
+
   validate(): void {
     if (!this._id) {
       throw new Error('Permission ID is required');
@@ -31,5 +43,9 @@ export default class Permission {
 
   changeDescription(description?: string): void {
     this._description = description ?? '';
+  }
+
+  matches(resource: string, action: string): boolean {
+    return this._resource === resource && this._action === action;
   }
 }
