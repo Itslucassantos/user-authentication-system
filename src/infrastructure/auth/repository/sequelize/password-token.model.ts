@@ -13,7 +13,7 @@ import { PasswordTokenType } from '../../../../domain/auth/enum/password-token-t
 @Table({
   tableName: 'password_tokens',
 })
-export default class PasswordToken extends Model {
+export default class PasswordTokenModel extends Model {
   @PrimaryKey
   @Column(DataType.STRING)
   declare id: string;
