@@ -23,6 +23,30 @@ export default class PasswordToken {
     this.validate();
   }
 
+  get id(): string {
+    return this._id;
+  }
+
+  get userId(): string {
+    return this._userId;
+  }
+
+  get type(): PasswordTokenType {
+    return this._type;
+  }
+
+  get tokenHash(): string {
+    return this._tokenHash;
+  }
+
+  get used(): boolean {
+    return this._used;
+  }
+
+  get expiresAt(): Date {
+    return this._expiresAt;
+  }
+
   validate(): void {
     if (!this._id) {
       throw new Error('ID is required');
