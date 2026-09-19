@@ -16,7 +16,9 @@ export default class PasswordTokenFactory {
         return new PasswordToken(uuid(), userId, PasswordTokenType.PASSWORD_RESET, tokenHash, expiresAt);
     }
 
-    static restore(id: string, userId: string, type: PasswordTokenType, tokenHash: string, expiresAt: Date): PasswordToken {
-        return new PasswordToken(id, userId, type, tokenHash, expiresAt);
+    static restore(id: string, userId: string, type: PasswordTokenType, tokenHash: string, expiresAt: Date, used: boolean): PasswordToken {
+        const token = new PasswordToken(id, userId, type, tokenHash, expiresAt);
+        if (used) token.markUsed();
+        return token;
     }
 }
