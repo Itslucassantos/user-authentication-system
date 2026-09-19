@@ -9,7 +9,7 @@ import {
   Table,
 } from 'sequelize-typescript';
 import RoleModel from '../../../role/repository/sequelize/role.model.js';
-import PasswordTokenModel from '../../../auth/repository/sequelize/password-token.js';
+import PasswordTokenModel from '../../../auth/repository/sequelize/password-token.model.js';
 import UserRoleModel from './user-role.model.js';
 
 @Table({

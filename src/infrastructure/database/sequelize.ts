@@ -6,7 +6,7 @@ import RoleModel from '../role/repository/sequelize/role.model.js';
 import PermissionModel from '../role/repository/sequelize/permission.model.js';
 import RolePermissionModel from '../role/repository/sequelize/role-permission.model.js';
 import ClientApplicationModel from '../client-application/repository/sequelize/client-application.model.js';
-import PasswordTokenModel from '../auth/repository/sequelize/password-token.js';
+import PasswordTokenModel from '../auth/repository/sequelize/password-token.model.js';
 
 try {
   process.loadEnvFile();
