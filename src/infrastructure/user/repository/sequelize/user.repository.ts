@@ -25,6 +25,7 @@ export default class UserRepository implements UserRepositoryInterface {
 
         return this.toDomainEntity(model);
     }
+
     async findAll({ page, limit }: PaginationParams): Promise<PaginatedResult<User>> {
         const { rows, count } = await UserModel.findAndCountAll({
             limit,
@@ -42,6 +43,16 @@ export default class UserRepository implements UserRepositoryInterface {
             totalPages: Math.ceil(count / limit),
         };
     }
+
+    async findByEmail(email: Email): Promise<User | null> {
+        const model = await UserModel.findOne({ where: { email: email.value }, include: ROLES_INCLUDE });
+        if (!model) {
+            return null;
+        }
+
+        return this.toDomainEntity(model);
+    }
+
     private toDomainEntity(model: UserModel): User {
         return UserFactory.restore({
             id: model.id,
@@ -52,6 +63,7 @@ export default class UserRepository implements UserRepositoryInterface {
             roles: (model.roles ?? []).map((role) => RoleMapper.toDomain(role)),
         });
     }
+
     async save(entity: User): Promise<void> {
         try {
             await UserModel.create(UserMapper.toPersistence(entity));
@@ -62,6 +74,7 @@ export default class UserRepository implements UserRepositoryInterface {
             throw new RepositoryError('Failed to save user', error);
         }
     }
+
     async update(entity: User): Promise<void> {
         try {
             await sequelize.transaction(async (transaction) => {
@@ -89,6 +102,7 @@ export default class UserRepository implements UserRepositoryInterface {
             throw new RepositoryError('Failed to update user', error);
         }
     }
+
     async delete(id: string): Promise<void> {
         try {
             const deletedCount = await UserModel.destroy({ where: { id } });
