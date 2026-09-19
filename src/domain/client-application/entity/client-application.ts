@@ -91,7 +91,7 @@ export default class ClientApplication {
   }
 
   removeRedirectUri(redirectUri: string): void {
-    const remaining = this._redirectUris.filter(uri => uri !== redirectUri);
+    const remaining = this._redirectUris.filter((uri) => uri !== redirectUri);
     if (remaining.length === 0) {
       throw new Error('At least one redirect URI is required');
     }
