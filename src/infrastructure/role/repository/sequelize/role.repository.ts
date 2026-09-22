@@ -18,6 +18,17 @@ import PermissionModel from './permission.model.js';
 const PERMISSIONS_INCLUDE = [PermissionModel];
 
 export default class RoleRepository implements RoleRepositoryInterface {
+  async findByIds(ids: string[]): Promise<Role[]> {
+    const models = await RoleModel.findAll({
+      where: {
+        id: ids,
+      },
+      include: PERMISSIONS_INCLUDE,
+    });
+    
+    return models.map((model) => this.toDomain(model));
+  }
+  
   async findById(id: string): Promise<Role | null> {
     const model = await RoleModel.findByPk(id, {
       rejectOnEmpty: false,
