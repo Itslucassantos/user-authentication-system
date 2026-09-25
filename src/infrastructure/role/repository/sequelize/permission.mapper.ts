@@ -3,6 +3,16 @@ import PermissionFactory from '../../../../domain/role/factory/permission.factor
 import type PermissionModel from './permission.model.js';
 
 export default class PermissionMapper {
+  static toPersistence(entity: Permission) {
+    return {
+      id: entity.id,
+      name: entity.name,
+      resource: entity.resource,
+      action: entity.action,
+      description: entity.description,
+    };
+  }
+
   static toDomain(model: PermissionModel): Permission {
     return PermissionFactory.restore(
       model.id,

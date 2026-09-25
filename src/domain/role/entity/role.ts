@@ -72,4 +72,20 @@ export default class Role {
       (permission) => permission.resource === resource && permission.action === action,
     );
   }
+
+  changeName(name: string): void {
+    if (!name) {
+      throw new Error('Role name is required');
+    }
+
+    this._name = name;
+  }
+
+  changeDescription(description: string): void {
+    if (!description) {
+      throw new Error('Role description is required');
+    }
+
+    this._description = description;
+  }
 }

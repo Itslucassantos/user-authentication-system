@@ -18,6 +18,44 @@ import PermissionModel from './permission.model.js';
 const PERMISSIONS_INCLUDE = [PermissionModel];
 
 export default class RoleRepository implements RoleRepositoryInterface {
+  async findAllByClientApplication(
+    clientApplicationId: string,
+    { page, limit }: PaginationParams,
+  ): Promise<PaginatedResult<Role>> {
+    const { rows, count } = await RoleModel.findAndCountAll({
+      where: {
+        clientApplicationId,
+      },
+      limit,
+      offset: (page - 1) * limit,
+      order: [['createdAt', 'DESC']],
+      include: PERMISSIONS_INCLUDE,
+      distinct: true,
+    });
+
+    return {
+      items: rows.map((model) => this.toDomain(model)),
+      total: count,
+      page,
+      limit,
+      totalPages: Math.ceil(count / limit),
+    };
+  }
+
+  async findByName(clientApplicationId: string, name: string): Promise<Role | null> {
+    const model = await RoleModel.findOne({
+      where: {
+        clientApplicationId,
+        name,
+      },
+      include: PERMISSIONS_INCLUDE,
+    });
+    if (!model) {
+      return null;
+    }
+    return this.toDomain(model);
+  }
+
   async findByIds(ids: string[]): Promise<Role[]> {
     const models = await RoleModel.findAll({
       where: {
@@ -25,10 +63,10 @@ export default class RoleRepository implements RoleRepositoryInterface {
       },
       include: PERMISSIONS_INCLUDE,
     });
-    
+
     return models.map((model) => this.toDomain(model));
   }
-  
+
   async findById(id: string): Promise<Role | null> {
     const model = await RoleModel.findByPk(id, {
       rejectOnEmpty: false,

@@ -18,6 +18,14 @@ export default class Permission {
     return this._id;
   }
 
+  get name(): string {
+    return this._name;
+  }
+
+  get description(): string {
+    return this._description ?? '';
+  }
+
   get resource(): string {
     return this._resource;
   }
