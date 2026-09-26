@@ -1,12 +1,8 @@
 import type Role from '../../../domain/role/entity/role.js';
-
-export interface PermissionOutputDto {
-  id: string;
-  name: string;
-  resource: string;
-  action: string;
-  description: string;
-}
+import {
+  type PermissionOutputDto,
+  toPermissionOutputDto,
+} from '../../permission/@shared/permission-output.dto.js';
 
 export interface RoleOutputDto {
   id: string;
@@ -22,12 +18,6 @@ export function toRoleOutputDto(role: Role): RoleOutputDto {
     clientApplicationId: role.clientApplicationId,
     name: role.name,
     description: role.description,
-    permissions: role.permissions.map((permission) => ({
-      id: permission.id,
-      name: permission.name,
-      resource: permission.resource,
-      action: permission.action,
-      description: permission.description,
-    })),
+    permissions: role.permissions.map(toPermissionOutputDto),
   };
 }
