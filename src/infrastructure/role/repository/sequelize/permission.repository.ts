@@ -1,13 +1,16 @@
+import { ForeignKeyConstraintError } from 'sequelize';
 import RepositoryError from '../../../../domain/@shared/error/repository-error.js';
 import type {
   PaginationParams,
   PaginatedResult,
 } from '../../../../domain/@shared/repository/pagination.js';
 import type Permission from '../../../../domain/role/entity/permission.js';
+import PermissionInUseError from '../../../../domain/role/error/permission-in-use-error.js';
 import PermissionNotFoundError from '../../../../domain/role/error/permission-not-found-error.js';
 import type PermissionRepositoryInterface from '../../../../domain/role/repository/permission-repository.interface.js';
 import PermissionMapper from './permission.mapper.js';
 import PermissionModel from './permission.model.js';
+import RolePermissionModel from './role-permission.model.js';
 
 export default class PermissionRepository implements PermissionRepositoryInterface {
   async findById(id: string): Promise<Permission | null> {
@@ -26,6 +29,11 @@ export default class PermissionRepository implements PermissionRepositoryInterfa
     });
 
     return models.map((model) => PermissionMapper.toDomain(model));
+  }
+
+  async isInUse(id: string): Promise<boolean> {
+    const count = await RolePermissionModel.count({ where: { permissionId: id } });
+    return count > 0;
   }
 
   async findAll({ page, limit }: PaginationParams): Promise<PaginatedResult<Permission>> {
@@ -77,6 +85,9 @@ export default class PermissionRepository implements PermissionRepositoryInterfa
     } catch (error) {
       if (error instanceof PermissionNotFoundError) {
         throw error;
+      }
+      if (error instanceof ForeignKeyConstraintError) {
+        throw new PermissionInUseError(id);
       }
       throw new RepositoryError('Failed to delete permission', error);
     }
