@@ -55,6 +55,7 @@ export default class ClientApplicationRepository implements ClientApplicationRep
       model.clientId,
       model.clientSecretHash,
       model.redirectUris,
+      model.active,
       (model.roles ?? []).map((role) => RoleMapper.toDomain(role)),
     );
   }
