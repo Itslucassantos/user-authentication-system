@@ -21,9 +21,10 @@ export default class PermissionRepository implements PermissionRepositoryInterfa
     return PermissionMapper.toDomain(model);
   }
 
-  async findByIds(ids: string[]): Promise<Permission[]> {
+  async findByIds(clientApplicationId: string, ids: string[]): Promise<Permission[]> {
     const models = await PermissionModel.findAll({
       where: {
+        clientApplicationId,
         id: ids,
       },
     });
@@ -38,6 +39,26 @@ export default class PermissionRepository implements PermissionRepositoryInterfa
 
   async findAll({ page, limit }: PaginationParams): Promise<PaginatedResult<Permission>> {
     const { rows, count } = await PermissionModel.findAndCountAll({
+      limit,
+      offset: (page - 1) * limit,
+      order: [['createdAt', 'DESC']],
+    });
+
+    return {
+      items: rows.map((model) => PermissionMapper.toDomain(model)),
+      total: count,
+      page,
+      limit,
+      totalPages: Math.ceil(count / limit),
+    };
+  }
+
+  async findAllByClientApplication(
+    clientApplicationId: string,
+    { page, limit }: PaginationParams,
+  ): Promise<PaginatedResult<Permission>> {
+    const { rows, count } = await PermissionModel.findAndCountAll({
+      where: { clientApplicationId },
       limit,
       offset: (page - 1) * limit,
       order: [['createdAt', 'DESC']],

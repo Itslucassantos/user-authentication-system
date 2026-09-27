@@ -2,6 +2,7 @@ import type Permission from '../../../domain/role/entity/permission.js';
 
 export interface PermissionOutputDto {
   id: string;
+  clientApplicationId: string;
   name: string;
   resource: string;
   action: string;
@@ -11,6 +12,7 @@ export interface PermissionOutputDto {
 export function toPermissionOutputDto(permission: Permission): PermissionOutputDto {
   return {
     id: permission.id,
+    clientApplicationId: permission.clientApplicationId,
     name: permission.name,
     resource: permission.resource,
     action: permission.action,

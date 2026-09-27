@@ -58,13 +58,23 @@ export default class Role {
     if (!this._permissions || this._permissions.length === 0) {
       throw new Error('Role must have at least one permission');
     }
+    this.ensureSameClientApplication(this._permissions);
   }
 
   changePermissions(permissions: Permission[]): void {
     if (!permissions || permissions.length === 0) {
       throw new Error('Role must have at least one permission');
     }
+    this.ensureSameClientApplication(permissions);
     this._permissions = permissions;
+  }
+
+  private ensureSameClientApplication(permissions: Permission[]): void {
+    if (
+      permissions.some((permission) => permission.clientApplicationId !== this._clientApplicationId)
+    ) {
+      throw new Error('Role permissions must belong to the same client application as the role');
+    }
   }
 
   hasPermission(resource: string, action: string): boolean {

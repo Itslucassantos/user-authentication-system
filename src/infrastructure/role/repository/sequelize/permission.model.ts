@@ -1,4 +1,14 @@
-import { BelongsToMany, Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import {
+  BelongsTo,
+  BelongsToMany,
+  Column,
+  DataType,
+  ForeignKey,
+  Model,
+  PrimaryKey,
+  Table,
+} from 'sequelize-typescript';
+import ClientApplicationModel from '../../../client-application/repository/sequelize/client-application.model.js';
 import RoleModel from './role.model.js';
 import RolePermissionModel from './role-permission.model.js';
 
@@ -9,6 +19,13 @@ export default class PermissionModel extends Model {
   @PrimaryKey
   @Column(DataType.STRING)
   declare id: string;
+
+  @ForeignKey(() => ClientApplicationModel)
+  @Column({ type: DataType.STRING, allowNull: false, field: 'client_application_id' })
+  declare clientApplicationId: string;
+
+  @BelongsTo(() => ClientApplicationModel)
+  declare clientApplication: ClientApplicationModel;
 
   @Column({ type: DataType.STRING, allowNull: false })
   declare name: string;

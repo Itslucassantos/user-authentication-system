@@ -1,12 +1,21 @@
 export default class Permission {
   private _id: string;
+  private _clientApplicationId: string;
   private _name: string;
   private _resource: string;
   private _action: string;
   private _description?: string = '';
 
-  constructor(id: string, name: string, resource: string, action: string, description?: string) {
+  constructor(
+    id: string,
+    clientApplicationId: string,
+    name: string,
+    resource: string,
+    action: string,
+    description?: string,
+  ) {
     this._id = id;
+    this._clientApplicationId = clientApplicationId;
     this._name = name;
     this._resource = resource;
     this._action = action;
@@ -16,6 +25,10 @@ export default class Permission {
 
   get id(): string {
     return this._id;
+  }
+
+  get clientApplicationId(): string {
+    return this._clientApplicationId;
   }
 
   get name(): string {
@@ -37,6 +50,9 @@ export default class Permission {
   validate(): void {
     if (!this._id) {
       throw new Error('Permission ID is required');
+    }
+    if (!this._clientApplicationId) {
+      throw new Error('Application ID is required');
     }
     if (!this._name) {
       throw new Error('Permission name is required');

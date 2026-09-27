@@ -24,7 +24,10 @@ export default class CreateRoleUseCase {
     const existing = await this.roleRepository.findByName(clientApplicationId, name);
     if (existing) throw new RoleAlreadyExistsError(name);
 
-    const permissions = await this.permissionRepository.findByIds(permissionIds);
+    const permissions = await this.permissionRepository.findByIds(
+      clientApplicationId,
+      permissionIds,
+    );
 
     const foundPermissionIds = new Set(permissions.map((permission) => permission.id));
     const missingPermissionId = permissionIds.find((id) => !foundPermissionIds.has(id));

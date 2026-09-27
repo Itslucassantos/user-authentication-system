@@ -20,7 +20,10 @@ export default class AssignPermissionsToRoleUseCase {
     const role = await this.roleRepository.findById(roleId);
     if (!role) throw new RoleNotFoundError(roleId);
 
-    const permissions = await this.permissionRepository.findByIds(permissionIds);
+    const permissions = await this.permissionRepository.findByIds(
+      role.clientApplicationId,
+      permissionIds,
+    );
 
     const foundPermissionIds = new Set(permissions.map((permission) => permission.id));
     const missingPermissionId = permissionIds.find((id) => !foundPermissionIds.has(id));

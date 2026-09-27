@@ -6,6 +6,7 @@ export default class PermissionMapper {
   static toPersistence(entity: Permission) {
     return {
       id: entity.id,
+      clientApplicationId: entity.clientApplicationId,
       name: entity.name,
       resource: entity.resource,
       action: entity.action,
@@ -16,6 +17,7 @@ export default class PermissionMapper {
   static toDomain(model: PermissionModel): Permission {
     return PermissionFactory.restore(
       model.id,
+      model.clientApplicationId,
       model.name,
       model.resource,
       model.action,

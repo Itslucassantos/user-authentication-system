@@ -1,6 +1,7 @@
 import type { PermissionOutputDto } from '../@shared/permission-output.dto.js';
 
 export interface ListPermissionsInputDto {
+  clientApplicationId: string;
   page: number;
   limit: number;
 }

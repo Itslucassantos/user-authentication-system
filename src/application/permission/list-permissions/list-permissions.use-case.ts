@@ -6,9 +6,12 @@ export default class ListPermissionsUseCase {
   constructor(private readonly permissionRepository: PermissionRepositoryInterface) {}
 
   async execute(input: ListPermissionsInputDto): Promise<ListPermissionsOutputDto> {
-    const { page, limit } = input;
+    const { clientApplicationId, page, limit } = input;
 
-    const result = await this.permissionRepository.findAll({ page, limit });
+    const result = await this.permissionRepository.findAllByClientApplication(clientApplicationId, {
+      page,
+      limit,
+    });
 
     return {
       items: result.items.map((permission) => toPermissionOutputDto(permission)),
