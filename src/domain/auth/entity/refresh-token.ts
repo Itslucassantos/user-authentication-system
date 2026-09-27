@@ -24,6 +24,34 @@ export default class RefreshToken {
     this.validate();
   }
 
+  get id(): string {
+    return this._id;
+  }
+
+  get userId(): string {
+    return this._userId;
+  }
+
+  get clientApplicationId(): string {
+    return this._clientApplicationId;
+  }
+
+  get tokenHash(): string {
+    return this._tokenHash;
+  }
+
+  get deviceInfo(): string {
+    return this._deviceInfo;
+  }
+
+  get revoked(): boolean {
+    return this._revoked;
+  }
+
+  get expiresAt(): Date {
+    return this._expiresAt;
+  }
+
   validate(): void {
     if (!this._id) {
       throw new Error('ID is required');

@@ -1,7 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import RefreshToken from '../entity/refresh-token.js';
 
-// Deve acompanhar JWT_REFRESH_TTL (.env) — hoje fixo em código, igual ao padrão do PasswordTokenFactory.
 const REFRESH_TOKEN_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 
 export default class RefreshTokenFactory {
@@ -22,7 +21,17 @@ export default class RefreshTokenFactory {
     tokenHash: string,
     deviceInfo: string,
     expiresAt: Date,
+    revoked: boolean,
   ): RefreshToken {
-    return new RefreshToken(id, userId, clientApplicationId, tokenHash, deviceInfo, expiresAt);
+    const token = new RefreshToken(
+      id,
+      userId,
+      clientApplicationId,
+      tokenHash,
+      deviceInfo,
+      expiresAt,
+    );
+    if (revoked) token.revoke();
+    return token;
   }
 }
