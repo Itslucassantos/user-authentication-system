@@ -19,6 +19,15 @@ import RoleMapper from '../../../role/repository/sequelize/role.mapper.js';
 
 const ROLES_INCLUDE = [{ model: RoleModel, include: [PermissionModel] }];
 
+const rolesIncludeForClientApplication = (clientApplicationId: string) => [
+  {
+    model: RoleModel,
+    required: true,
+    where: { clientApplicationId },
+    include: [PermissionModel],
+  },
+];
+
 export default class UserRepository implements UserRepositoryInterface {
   async findById(id: string): Promise<User | null> {
     const model = await UserModel.findByPk(id, { rejectOnEmpty: false, include: ROLES_INCLUDE });
@@ -35,6 +44,27 @@ export default class UserRepository implements UserRepositoryInterface {
       offset: (page - 1) * limit,
       order: [['createdAt', 'DESC']],
       include: ROLES_INCLUDE,
+      distinct: true,
+    });
+
+    return {
+      items: rows.map((model) => this.toDomainEntity(model)),
+      total: count,
+      page,
+      limit,
+      totalPages: Math.ceil(count / limit),
+    };
+  }
+
+  async findAllByClientApplication(
+    clientApplicationId: string,
+    { page, limit }: PaginationParams,
+  ): Promise<PaginatedResult<User>> {
+    const { rows, count } = await UserModel.findAndCountAll({
+      limit,
+      offset: (page - 1) * limit,
+      order: [['createdAt', 'DESC']],
+      include: rolesIncludeForClientApplication(clientApplicationId),
       distinct: true,
     });
 

@@ -72,6 +72,14 @@ export default class ClientApplication {
     }
   }
 
+  changeName(name: string): void {
+    if (!name) {
+      throw new Error('Client Application name is required');
+    }
+
+    this._name = name;
+  }
+
   activate(): void {
     this._active = true;
   }

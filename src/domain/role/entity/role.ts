@@ -58,18 +58,44 @@ export default class Role {
     if (!this._permissions || this._permissions.length === 0) {
       throw new Error('Role must have at least one permission');
     }
+    this.ensureSameClientApplication(this._permissions);
   }
 
   changePermissions(permissions: Permission[]): void {
     if (!permissions || permissions.length === 0) {
       throw new Error('Role must have at least one permission');
     }
+    this.ensureSameClientApplication(permissions);
     this._permissions = permissions;
+  }
+
+  private ensureSameClientApplication(permissions: Permission[]): void {
+    if (
+      permissions.some((permission) => permission.clientApplicationId !== this._clientApplicationId)
+    ) {
+      throw new Error('Role permissions must belong to the same client application as the role');
+    }
   }
 
   hasPermission(resource: string, action: string): boolean {
     return this._permissions.some(
       (permission) => permission.resource === resource && permission.action === action,
     );
+  }
+
+  changeName(name: string): void {
+    if (!name) {
+      throw new Error('Role name is required');
+    }
+
+    this._name = name;
+  }
+
+  changeDescription(description: string): void {
+    if (!description) {
+      throw new Error('Role description is required');
+    }
+
+    this._description = description;
   }
 }

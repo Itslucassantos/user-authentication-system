@@ -30,6 +30,30 @@ export default class ClientApplicationRepository implements ClientApplicationRep
     return this.toDomain(model);
   }
 
+  async findByName(name: string): Promise<ClientApplication | null> {
+    const model = await ClientApplicationModel.findOne({
+      where: { name },
+      include: ROLES_INCLUDE,
+    });
+    if (!model) {
+      return null;
+    }
+
+    return this.toDomain(model);
+  }
+
+  async findByClientId(clientId: string): Promise<ClientApplication | null> {
+    const model = await ClientApplicationModel.findOne({
+      where: { clientId },
+      include: ROLES_INCLUDE,
+    });
+    if (!model) {
+      return null;
+    }
+
+    return this.toDomain(model);
+  }
+
   async findAll(params: PaginationParams): Promise<PaginatedResult<ClientApplication>> {
     const { rows, count } = await ClientApplicationModel.findAndCountAll({
       limit: params.limit,
@@ -55,6 +79,7 @@ export default class ClientApplicationRepository implements ClientApplicationRep
       model.clientId,
       model.clientSecretHash,
       model.redirectUris,
+      model.active,
       (model.roles ?? []).map((role) => RoleMapper.toDomain(role)),
     );
   }

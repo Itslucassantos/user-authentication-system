@@ -11,7 +11,7 @@ import PasswordTokenModel from '../auth/repository/sequelize/password-token.mode
 try {
   process.loadEnvFile();
 } catch {
-  // .env ausente — segue com process.env
+  console.warn('.env file not found, using process.env');
 }
 
 export const sequelize = new Sequelize({

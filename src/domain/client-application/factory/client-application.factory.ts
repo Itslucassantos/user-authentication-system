@@ -19,8 +19,19 @@ export default class ClientApplicationFactory {
     clientId: string,
     clientSecretHash: string,
     redirectUris: string[],
+    active: boolean,
     roles?: Role[],
   ): ClientApplication {
-    return new ClientApplication(id, name, clientId, clientSecretHash, redirectUris, roles);
+    const clientApplication = new ClientApplication(
+      id,
+      name,
+      clientId,
+      clientSecretHash,
+      redirectUris,
+      roles,
+    );
+    if (!active) clientApplication.deactivate();
+
+    return clientApplication;
   }
 }
