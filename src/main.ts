@@ -12,12 +12,12 @@ const port = Number(process.env.PORT ?? 3000);
 
 try {
   await sequelize.authenticate();
-  console.log('PostgreSQL conectado.');
+  console.log('PostgreSQL connected.');
 
   app.listen(port, () => {
-    console.log(`API ouvindo na porta ${port}`);
+    console.log(`API listening on port ${port}`);
   });
 } catch (error) {
-  console.error('Falha ao iniciar a aplicação:', error);
+  console.error('Failed to start the application:', error);
   process.exit(1);
 }
