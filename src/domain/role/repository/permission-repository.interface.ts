@@ -4,6 +4,11 @@ import type Permission from '../entity/permission.js';
 
 export default interface PermissionRepositoryInterface extends RepositoryInterface<Permission> {
   findByIds(clientApplicationId: string, ids: string[]): Promise<Permission[]>;
+  findByResourceAndAction(
+    clientApplicationId: string,
+    resource: string,
+    action: string,
+  ): Promise<Permission | null>;
   findAllByClientApplication(
     clientApplicationId: string,
     params: PaginationParams,

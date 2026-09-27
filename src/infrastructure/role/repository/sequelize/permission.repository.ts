@@ -1,10 +1,11 @@
-import { ForeignKeyConstraintError } from 'sequelize';
+import { ForeignKeyConstraintError, UniqueConstraintError } from 'sequelize';
 import RepositoryError from '../../../../domain/@shared/error/repository-error.js';
 import type {
   PaginationParams,
   PaginatedResult,
 } from '../../../../domain/@shared/repository/pagination.js';
 import type Permission from '../../../../domain/role/entity/permission.js';
+import PermissionAlreadyExistsError from '../../../../domain/role/error/permission-already-exists-error.js';
 import PermissionInUseError from '../../../../domain/role/error/permission-in-use-error.js';
 import PermissionNotFoundError from '../../../../domain/role/error/permission-not-found-error.js';
 import type PermissionRepositoryInterface from '../../../../domain/role/repository/permission-repository.interface.js';
@@ -30,6 +31,20 @@ export default class PermissionRepository implements PermissionRepositoryInterfa
     });
 
     return models.map((model) => PermissionMapper.toDomain(model));
+  }
+
+  async findByResourceAndAction(
+    clientApplicationId: string,
+    resource: string,
+    action: string,
+  ): Promise<Permission | null> {
+    const model = await PermissionModel.findOne({
+      where: { clientApplicationId, resource, action },
+    });
+    if (!model) {
+      return null;
+    }
+    return PermissionMapper.toDomain(model);
   }
 
   async isInUse(id: string): Promise<boolean> {
@@ -77,6 +92,9 @@ export default class PermissionRepository implements PermissionRepositoryInterfa
     try {
       await PermissionModel.create(PermissionMapper.toPersistence(entity));
     } catch (error) {
+      if (error instanceof UniqueConstraintError) {
+        throw new PermissionAlreadyExistsError(entity.resource, entity.action);
+      }
       throw new RepositoryError('Failed to save permission', error);
     }
   }
