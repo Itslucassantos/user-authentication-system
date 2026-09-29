@@ -7,4 +7,5 @@ export interface AccessTokenPayload {
 
 export default interface TokenServiceInterface {
   signAccessToken(payload: AccessTokenPayload): Promise<string>;
+  verifyAccessToken(token: string): Promise<AccessTokenPayload>;
 }

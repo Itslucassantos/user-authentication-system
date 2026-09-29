@@ -22,7 +22,8 @@
     "migrate": "tsx src/infrastructure/database/migrate.ts up",
     "migrate:down": "tsx src/infrastructure/database/migrate.ts down",
     "migrate:pending": "tsx src/infrastructure/database/migrate.ts pending",
-    "migrate:executed": "tsx src/infrastructure/database/migrate.ts executed"
+    "migrate:executed": "tsx src/infrastructure/database/migrate.ts executed",
+    "seed:admin": "tsx src/infrastructure/database/seed-admin.ts"
   },
   "repository": {
     "type": "git",
@@ -37,9 +38,15 @@
   },
   "homepage": "https://github.com/Itslucassantos/user-authentication-system#readme",
   "dependencies": {
+    "@apollo/server": "^5.5.1",
+    "@as-integrations/express5": "^1.1.2",
+    "@graphql-tools/schema": "^10.1.1",
+    "@graphql-tools/utils": "^12.0.1",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
+    "dataloader": "^2.2.3",
     "express": "^5.2.1",
+    "graphql": "^16.14.2",
     "ioredis": "^6.0.0",
     "jose": "^6.2.12",
     "nodemailer": "^10.0.10",
@@ -58,6 +65,7 @@
     "@babel/preset-typescript": "^7.29.7",
     "@eslint/js": "^10.0.1",
     "@types/bcrypt": "^6.0.0",
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
     "@types/node": "^26.4.1",

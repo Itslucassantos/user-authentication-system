@@ -16,6 +16,7 @@ import UserFactory from '../../../../domain/user/factory/user.factory.js';
 import RoleModel from '../../../role/repository/sequelize/role.model.js';
 import PermissionModel from '../../../role/repository/sequelize/permission.model.js';
 import RoleMapper from '../../../role/repository/sequelize/role.mapper.js';
+import UserRoleModel from './user-role.model.js';
 
 const ROLES_INCLUDE = [{ model: RoleModel, include: [PermissionModel] }];
 
@@ -121,12 +122,17 @@ export default class UserRepository implements UserRepositoryInterface {
         if (affectedCount === 0) {
           throw new UserNotFoundError(entity.id);
         }
-        const model = await UserModel.findByPk(entity.id, { transaction, rejectOnEmpty: true });
-        await model.$set(
-          'roles',
-          entity.roles.map((role) => role.id),
-          { transaction },
-        );
+        await UserRoleModel.destroy({ where: { userId: entity.id }, transaction });
+        if (entity.roles.length > 0) {
+          await UserRoleModel.bulkCreate(
+            entity.roles.map((role) => ({
+              userId: entity.id,
+              roleId: role.id,
+              clientApplicationId: role.clientApplicationId,
+            })),
+            { transaction },
+          );
+        }
       });
     } catch (error) {
       if (error instanceof UserNotFoundError) {
