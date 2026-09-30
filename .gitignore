@@ -58,3 +58,5 @@ temp/
 *.tmp
 
 .env
+# Internal domain modeling notes
+docs/ddd-modeling.md

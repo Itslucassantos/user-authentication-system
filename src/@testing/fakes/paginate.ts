@@ -1,0 +1,15 @@
+import type {
+  PaginatedResult,
+  PaginationParams,
+} from '../../domain/@shared/repository/pagination.js';
+
+export function paginate<T>(items: T[], { page, limit }: PaginationParams): PaginatedResult<T> {
+  const start = (page - 1) * limit;
+  return {
+    items: items.slice(start, start + limit),
+    total: items.length,
+    page,
+    limit,
+    totalPages: Math.ceil(items.length / limit),
+  };
+}
