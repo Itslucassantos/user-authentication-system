@@ -1,0 +1,154 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+directive @auth(permission: String!) on FIELD_DEFINITION
+
+directive @authenticated on FIELD_DEFINITION
+
+type Query {
+  _empty: Boolean
+  me: User
+  user(id: ID!): User @auth(permission: "user:read")
+  users(clientApplicationId: ID, page: Int = 1, limit: Int = 20): UserConnection!
+    @auth(permission: "user:read")
+  role(id: ID!): Role @auth(permission: "role:read")
+  roles(clientApplicationId: ID!, page: Int = 1, limit: Int = 20): RoleConnection!
+    @auth(permission: "role:read")
+  permission(id: ID!): Permission @auth(permission: "permission:read")
+  permissions(clientApplicationId: ID!, page: Int = 1, limit: Int = 20): PermissionConnection!
+    @auth(permission: "permission:read")
+  clientApplication(id: ID!): ClientApplication @auth(permission: "client-application:read")
+  clientApplications(page: Int = 1, limit: Int = 20): ClientApplicationConnection!
+    @auth(permission: "client-application:read")
+}
+
+type Mutation {
+  _empty: Boolean
+  login(email: String!, password: String!, clientId: String!): AuthPayload!
+  refreshToken(refreshToken: String!): AuthPayload!
+  logout(refreshToken: String!): Boolean!
+  logoutAllDevices: Boolean! @authenticated
+  createUser(input: CreateUserInput!): User! @auth(permission: "user:create")
+  updateUser(id: ID!, name: String!): User! @auth(permission: "user:update")
+  activateUser(id: ID!): User! @auth(permission: "user:update")
+  deactivateUser(id: ID!): User! @auth(permission: "user:update")
+  deleteUser(id: ID!): Boolean! @auth(permission: "user:delete")
+  setPassword(token: String!, newPassword: String!): Boolean!
+  requestPasswordReset(email: String!): Boolean!
+  assignRolesToUser(userId: ID!, roleIds: [ID!]!, clientApplicationId: ID!): User!
+    @auth(permission: "role:assign")
+  removeRolesFromUser(userId: ID!, roleIds: [ID!]!, clientApplicationId: ID!): User!
+    @auth(permission: "role:assign")
+  createRole(
+    name: String!
+    description: String!
+    clientApplicationId: ID!
+    permissionIds: [ID!]!
+  ): Role! @auth(permission: "role:create")
+  updateRole(id: ID!, name: String!, description: String!): Role! @auth(permission: "role:update")
+  assignPermissionsToRole(roleId: ID!, permissionIds: [ID!]!): Role!
+    @auth(permission: "role:assign")
+  deleteRole(id: ID!): Boolean! @auth(permission: "role:delete")
+  createPermission(
+    clientApplicationId: ID!
+    name: String!
+    resource: String!
+    action: String!
+    description: String
+  ): Permission! @auth(permission: "permission:create")
+  updatePermission(id: ID!, description: String): Permission! @auth(permission: "permission:update")
+  deletePermission(id: ID!): Boolean! @auth(permission: "permission:delete")
+  createClientApplication(name: String!, redirectUris: [String!]!): ClientApplicationCreated!
+    @auth(permission: "client-application:create")
+  updateClientApplication(id: ID!, name: String!): ClientApplication!
+    @auth(permission: "client-application:update")
+  rotateClientSecret(id: ID!): ClientApplicationCreated!
+    @auth(permission: "client-application:update")
+  addRedirectUri(id: ID!, uri: String!): ClientApplication!
+    @auth(permission: "client-application:update")
+  removeRedirectUri(id: ID!, uri: String!): ClientApplication!
+    @auth(permission: "client-application:update")
+  activateClientApplication(id: ID!): ClientApplication!
+    @auth(permission: "client-application:update")
+  deactivateClientApplication(id: ID!): ClientApplication!
+    @auth(permission: "client-application:update")
+  deleteClientApplication(id: ID!): Boolean! @auth(permission: "client-application:delete")
+}
+
+type PageInfo {
+  total: Int!
+  page: Int!
+  limit: Int!
+  totalPages: Int!
+}
+
+type AuthPayload {
+  accessToken: String!
+  refreshToken: String!
+  user: User!
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  active: Boolean!
+  roles(clientApplicationId: ID): [Role!]!
+}
+
+type UserConnection {
+  items: [User!]!
+  pageInfo: PageInfo!
+}
+
+input CreateUserInput {
+  name: String!
+  email: String!
+}
+
+type Role {
+  id: ID!
+  clientApplicationId: ID!
+  name: String!
+  description: String!
+  permissions: [Permission!]!
+}
+
+type RoleConnection {
+  items: [Role!]!
+  pageInfo: PageInfo!
+}
+
+type Permission {
+  id: ID!
+  clientApplicationId: ID!
+  name: String!
+  resource: String!
+  action: String!
+  description: String!
+}
+
+type PermissionConnection {
+  items: [Permission!]!
+  pageInfo: PageInfo!
+}
+
+type ClientApplication {
+  id: ID!
+  name: String!
+  clientId: ID!
+  redirectUris: [String!]!
+  active: Boolean!
+}
+
+type ClientApplicationConnection {
+  items: [ClientApplication!]!
+  pageInfo: PageInfo!
+}
+
+type ClientApplicationCreated {
+  clientApplication: ClientApplication!
+  clientSecret: String!
+}

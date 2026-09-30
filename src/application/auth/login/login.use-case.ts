@@ -23,17 +23,20 @@ export default class LoginUseCase {
     private readonly hasher: HasherInterface,
     private readonly tokenService: TokenServiceInterface,
     private readonly rateLimiter: RateLimiterInterface,
+    private readonly ipRateLimiter: RateLimiterInterface,
   ) {}
 
   async execute(input: LoginInputDto): Promise<LoginOutputDto> {
-    const { password, clientId, deviceInfo } = input;
+    const { password, clientId, deviceInfo, ipAddress } = input;
 
     const clientApplication = await this.clientApplicationRepository.findByClientId(clientId);
     if (!clientApplication || !clientApplication.active) throw new InvalidClientError(clientId);
 
     const email = new Email(input.email);
     const rateLimitKey = `login:${email.value.toLowerCase()}`;
+    const ipRateLimitKey = `login-ip:${ipAddress}`;
     await this.rateLimiter.ensureNotBlocked(rateLimitKey);
+    await this.ipRateLimiter.ensureNotBlocked(ipRateLimitKey);
 
     const user = await this.userRepository.findByEmail(email);
     const passwordMatches =
@@ -42,6 +45,7 @@ export default class LoginUseCase {
       (await this.hasher.compare(password, user.passwordHash));
     if (!user || !passwordMatches) {
       await this.rateLimiter.hit(rateLimitKey);
+      await this.ipRateLimiter.hit(ipRateLimitKey);
       throw new InvalidCredentialsError();
     }
     await this.rateLimiter.reset(rateLimitKey);

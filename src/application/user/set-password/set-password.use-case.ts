@@ -5,6 +5,7 @@ import type PasswordTokenRepositoryInterface from '../../../domain/auth/reposito
 import type RefreshTokenRepositoryInterface from '../../../domain/auth/repository/refresh-token-repository.interface.js';
 import type UserRepositoryInterface from '../../../domain/user/repository/user-repository.interface.js';
 import { sha256 } from '../../@shared/opaque-token.js';
+import { assertStrongPassword } from '../../@shared/password-policy.js';
 import type { SetPasswordInputDto } from './set-password.dto.js';
 
 export default class SetPasswordUseCase {
@@ -18,6 +19,8 @@ export default class SetPasswordUseCase {
 
   async execute(input: SetPasswordInputDto): Promise<void> {
     const { token, newPassword, ipAddress } = input;
+    assertStrongPassword(newPassword);
+
     const rateLimitKey = `set-password:${ipAddress}`;
     await this.rateLimiter.ensureNotBlocked(rateLimitKey);
 

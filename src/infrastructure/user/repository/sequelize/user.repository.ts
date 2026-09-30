@@ -1,4 +1,4 @@
-import { UniqueConstraintError } from 'sequelize';
+import { Op, UniqueConstraintError } from 'sequelize';
 import type User from '../../../../domain/user/entity/user.js';
 import type UserRepositoryInterface from '../../../../domain/user/repository/user-repository.interface.js';
 import type {
@@ -16,6 +16,7 @@ import UserFactory from '../../../../domain/user/factory/user.factory.js';
 import RoleModel from '../../../role/repository/sequelize/role.model.js';
 import PermissionModel from '../../../role/repository/sequelize/permission.model.js';
 import RoleMapper from '../../../role/repository/sequelize/role.mapper.js';
+import UserRoleModel from './user-role.model.js';
 
 const ROLES_INCLUDE = [{ model: RoleModel, include: [PermissionModel] }];
 
@@ -77,6 +78,16 @@ export default class UserRepository implements UserRepositoryInterface {
     };
   }
 
+  async findByIds(ids: string[]): Promise<User[]> {
+    if (ids.length === 0) return [];
+
+    const models = await UserModel.findAll({
+      where: { id: { [Op.in]: ids } },
+      include: ROLES_INCLUDE,
+    });
+    return models.map((model) => this.toDomainEntity(model));
+  }
+
   async findByEmail(email: Email): Promise<User | null> {
     const model = await UserModel.findOne({
       where: { email: email.value },
@@ -121,12 +132,17 @@ export default class UserRepository implements UserRepositoryInterface {
         if (affectedCount === 0) {
           throw new UserNotFoundError(entity.id);
         }
-        const model = await UserModel.findByPk(entity.id, { transaction, rejectOnEmpty: true });
-        await model.$set(
-          'roles',
-          entity.roles.map((role) => role.id),
-          { transaction },
-        );
+        await UserRoleModel.destroy({ where: { userId: entity.id }, transaction });
+        if (entity.roles.length > 0) {
+          await UserRoleModel.bulkCreate(
+            entity.roles.map((role) => ({
+              userId: entity.id,
+              roleId: role.id,
+              clientApplicationId: role.clientApplicationId,
+            })),
+            { transaction },
+          );
+        }
       });
     } catch (error) {
       if (error instanceof UserNotFoundError) {
