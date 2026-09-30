@@ -1,5 +1,6 @@
 export default /* GraphQL */ `
   directive @auth(permission: String!) on FIELD_DEFINITION
+  directive @authenticated on FIELD_DEFINITION
 
   type Query {
     _empty: Boolean

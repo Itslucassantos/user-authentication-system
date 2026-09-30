@@ -5,6 +5,7 @@ import type Email from '../value-object/email.js';
 
 export default interface UserRepositoryInterface extends RepositoryInterface<User> {
   findByEmail(email: Email): Promise<User | null>;
+  findByIds(ids: string[]): Promise<User[]>;
   findAllByClientApplication(
     clientApplicationId: string,
     params: PaginationParams,

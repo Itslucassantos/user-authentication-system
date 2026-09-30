@@ -9,6 +9,6 @@ export default /* GraphQL */ `
     login(email: String!, password: String!, clientId: String!): AuthPayload!
     refreshToken(refreshToken: String!): AuthPayload!
     logout(refreshToken: String!): Boolean!
-    logoutAllDevices: Boolean! @auth(permission: "user:read")
+    logoutAllDevices: Boolean! @authenticated
   }
 `;

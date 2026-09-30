@@ -2,28 +2,41 @@ import { GraphQLError, type GraphQLSchema, defaultFieldResolver } from 'graphql'
 import { getDirective, MapperKind, mapSchema } from '@graphql-tools/utils';
 import type { GraphQLContext } from '../context.js';
 
-const DIRECTIVE_NAME = 'auth';
+const AUTH_DIRECTIVE = 'auth';
+const AUTHENTICATED_DIRECTIVE = 'authenticated';
+
+function requireAuthenticated(context: GraphQLContext): void {
+  if (!context.currentUser) {
+    throw new GraphQLError('Authentication required', {
+      extensions: { code: 'UNAUTHENTICATED' },
+    });
+  }
+}
 
 export function applyAuthDirective(schema: GraphQLSchema): GraphQLSchema {
   return mapSchema(schema, {
     [MapperKind.OBJECT_FIELD]: (fieldConfig) => {
-      const authDirective = getDirective(schema, fieldConfig, DIRECTIVE_NAME)?.[0] as
+      const authDirective = getDirective(schema, fieldConfig, AUTH_DIRECTIVE)?.[0] as
         { permission: string } | undefined;
-      if (!authDirective) return fieldConfig;
+      const authenticatedDirective = getDirective(
+        schema,
+        fieldConfig,
+        AUTHENTICATED_DIRECTIVE,
+      )?.[0];
+
+      if (!authDirective && !authenticatedDirective) return fieldConfig;
 
       const { resolve = defaultFieldResolver } = fieldConfig;
-      const { permission } = authDirective;
 
       return {
         ...fieldConfig,
         resolve(source, args, context: GraphQLContext, info) {
-          if (!context.currentUser) {
-            throw new GraphQLError('Authentication required', {
-              extensions: { code: 'UNAUTHENTICATED' },
-            });
-          }
-          if (!context.currentUser.permissions.includes(permission)) {
-            throw new GraphQLError(`Missing permission "${permission}"`, {
+          requireAuthenticated(context);
+          if (
+            authDirective &&
+            !context.currentUser!.permissions.includes(authDirective.permission)
+          ) {
+            throw new GraphQLError(`Missing permission "${authDirective.permission}"`, {
               extensions: { code: 'FORBIDDEN' },
             });
           }

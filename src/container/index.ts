@@ -1,4 +1,6 @@
 import { redis } from '../infrastructure/redis/redis-client.js';
+import { env } from '../infrastructure/config/env.js';
+import type MailerInterface from '../application/@shared/mailer.interface.js';
 import EventDispatcher from '../domain/@shared/event/event-dispatcher.js';
 import UserCreatedEvent from '../domain/user/event/user-created.event.js';
 import PasswordResetRequestedEvent from '../domain/auth/event/password-reset-requested.event.js';
@@ -10,6 +12,7 @@ import RefreshTokenRepository from '../infrastructure/auth/repository/redis/refr
 import PasswordTokenRepository from '../infrastructure/auth/repository/sequelize/password-token.repository.js';
 import { loadMailerConfig } from '../infrastructure/mail/mailer-config.js';
 import NodemailerMailer from '../infrastructure/mail/nodemailer-mailer.js';
+import ConsoleMailer from '../infrastructure/mail/console-mailer.js';
 import RedisRateLimiter from '../infrastructure/rate-limit/redis-rate-limiter.js';
 import ClientApplicationRepository from '../infrastructure/client-application/repository/sequelize/client-application.repository.js';
 import RoleRepository from '../infrastructure/role/repository/sequelize/role.repository.js';
@@ -60,12 +63,6 @@ import ActivateClientApplicationUseCase from '../application/client-application/
 import DeactivateClientApplicationUseCase from '../application/client-application/deactivate-client-application/deactivate-client-application.use-case.js';
 import DeleteClientApplicationUseCase from '../application/client-application/delete-client-application/delete-client-application.use-case.js';
 
-try {
-  process.loadEnvFile();
-} catch {
-  console.warn('.env file not found, using process.env');
-}
-
 const userRepository = new UserRepository();
 const roleRepository = new RoleRepository();
 const permissionRepository = new PermissionRepository();
@@ -76,7 +73,16 @@ const refreshTokenRepository = new RefreshTokenRepository(redis);
 const hasher = new BcryptHasher();
 const tokenService = new JoseTokenService(loadJwtConfig());
 const rateLimiter = new RedisRateLimiter(redis);
-const mailer = new NodemailerMailer(loadMailerConfig());
+const loginIpRateLimiter = new RedisRateLimiter(redis, {
+  maxAttempts: env.LOGIN_IP_RATE_LIMIT_MAX_ATTEMPTS,
+  blockSeconds: env.LOGIN_IP_RATE_LIMIT_BLOCK_SECONDS,
+});
+if (env.NODE_ENV === 'production' && !env.MAIL_HOST) {
+  throw new Error('MAIL_HOST (and MAIL_PORT/MAIL_FROM) are required when NODE_ENV=production');
+}
+const mailer: MailerInterface = env.MAIL_HOST
+  ? new NodemailerMailer(loadMailerConfig())
+  : new ConsoleMailer(env.APP_BASE_URL);
 
 const eventDispatcher = new EventDispatcher();
 eventDispatcher.register(UserCreatedEvent.name, new SendInvitationEmailHandler(mailer));
@@ -101,6 +107,7 @@ export const useCases = {
       hasher,
       tokenService,
       rateLimiter,
+      loginIpRateLimiter,
     ),
     refreshToken: new RefreshTokenUseCase(
       refreshTokenRepository,

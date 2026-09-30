@@ -1,14 +1,9 @@
 import { Redis } from 'ioredis';
-
-try {
-  process.loadEnvFile();
-} catch {
-  console.warn('.env file not found, using process.env');
-}
+import { env } from '../config/env.js';
 
 export const redis = new Redis({
-  host: process.env.REDIS_HOST ?? 'localhost',
-  port: Number(process.env.REDIS_PORT ?? 6379),
+  host: env.REDIS_HOST,
+  port: env.REDIS_PORT,
   lazyConnect: true,
-  ...(process.env.REDIS_PASSWORD ? { password: process.env.REDIS_PASSWORD } : {}),
+  ...(env.REDIS_PASSWORD ? { password: env.REDIS_PASSWORD } : {}),
 });

@@ -1,24 +1,24 @@
 import { useCases } from '../../../container/index.js';
 import type { GraphQLContext } from '../context.js';
-
-export interface LoginArgs {
-  email: string;
-  password: string;
-  clientId: string;
-}
+import type {
+  GqlMutationLoginArgs,
+  GqlMutationLogoutArgs,
+  GqlMutationRefreshTokenArgs,
+} from '../generated/schema-types.js';
 
 export const authResolvers = {
   Mutation: {
-    login: (_: unknown, args: LoginArgs, ctx: GraphQLContext) =>
+    login: (_: unknown, args: GqlMutationLoginArgs, ctx: GraphQLContext) =>
       useCases.auth.login.execute({
         ...args,
         deviceInfo: ctx.req.headers['user-agent'] ?? 'unknown',
+        ipAddress: ctx.req.ip ?? 'unknown',
       }),
 
-    refreshToken: (_: unknown, args: { refreshToken: string }) =>
+    refreshToken: (_: unknown, args: GqlMutationRefreshTokenArgs) =>
       useCases.auth.refreshToken.execute(args),
 
-    logout: async (_: unknown, args: { refreshToken: string }): Promise<boolean> => {
+    logout: async (_: unknown, args: GqlMutationLogoutArgs): Promise<boolean> => {
       await useCases.auth.logout.execute(args);
       return true;
     },

@@ -1,10 +1,6 @@
 import { loadMailerConfig } from './mailer-config.js';
 import NodemailerMailer from './nodemailer-mailer.js';
 
-try {
-  process.loadEnvFile();
-} catch {}
-
 const to = process.argv[2];
 if (!to) {
   console.error('Use: npm run mail:test -- person@example.com');

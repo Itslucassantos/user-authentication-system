@@ -1,6 +1,7 @@
 import { unwrapResolverError } from '@apollo/server/errors';
 import { GraphQLError, type GraphQLFormattedError } from 'graphql';
 import TooManyRequestsError from '../../application/@shared/too-many-requests-error.js';
+import { logger } from '../../infrastructure/logging/logger.js';
 
 const NOT_FOUND = new Set([
   'UserNotFoundError',
@@ -53,7 +54,7 @@ export function formatGraphQLError(
     if (original.name === 'Error') return withCode(formattedError, original, 'BAD_USER_INPUT');
   }
 
-  console.error(original);
+  logger.error({ err: original }, 'Unhandled GraphQL error');
   return {
     ...formattedError,
     message: 'Internal server error',

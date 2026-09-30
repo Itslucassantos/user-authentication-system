@@ -12,12 +12,6 @@ import RoleRepository from '../role/repository/sequelize/role.repository.js';
 import UserRepository from '../user/repository/sequelize/user.repository.js';
 import { sequelize } from './sequelize.js';
 
-try {
-  process.loadEnvFile();
-} catch {
-  console.warn('.env file not found, using process.env');
-}
-
 const PERMISSIONS: ReadonlyArray<{ resource: string; action: string }> = [
   { resource: 'user', action: 'create' },
   { resource: 'user', action: 'read' },

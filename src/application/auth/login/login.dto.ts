@@ -5,6 +5,7 @@ export interface LoginInputDto {
   password: string;
   clientId: string;
   deviceInfo: string;
+  ipAddress: string;
 }
 
 export type LoginOutputDto = AuthPayloadOutputDto;

@@ -1,4 +1,4 @@
-import { UniqueConstraintError } from 'sequelize';
+import { Op, UniqueConstraintError } from 'sequelize';
 import type User from '../../../../domain/user/entity/user.js';
 import type UserRepositoryInterface from '../../../../domain/user/repository/user-repository.interface.js';
 import type {
@@ -76,6 +76,16 @@ export default class UserRepository implements UserRepositoryInterface {
       limit,
       totalPages: Math.ceil(count / limit),
     };
+  }
+
+  async findByIds(ids: string[]): Promise<User[]> {
+    if (ids.length === 0) return [];
+
+    const models = await UserModel.findAll({
+      where: { id: { [Op.in]: ids } },
+      include: ROLES_INCLUDE,
+    });
+    return models.map((model) => this.toDomainEntity(model));
   }
 
   async findByEmail(email: Email): Promise<User | null> {

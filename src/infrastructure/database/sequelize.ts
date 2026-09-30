@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import { Sequelize } from 'sequelize-typescript';
+import { env } from '../config/env.js';
 import UserModel from '../user/repository/sequelize/user.model.js';
 import UserRoleModel from '../user/repository/sequelize/user-role.model.js';
 import RoleModel from '../role/repository/sequelize/role.model.js';
@@ -8,19 +9,13 @@ import RolePermissionModel from '../role/repository/sequelize/role-permission.mo
 import ClientApplicationModel from '../client-application/repository/sequelize/client-application.model.js';
 import PasswordTokenModel from '../auth/repository/sequelize/password-token.model.js';
 
-try {
-  process.loadEnvFile();
-} catch {
-  console.warn('.env file not found, using process.env');
-}
-
 export const sequelize = new Sequelize({
   dialect: 'postgres',
-  host: process.env.POSTGRES_HOST ?? 'localhost',
-  port: Number(process.env.POSTGRES_PORT ?? 5432),
-  database: process.env.POSTGRES_DB ?? 'auth_db',
-  username: process.env.POSTGRES_USER ?? 'auth_user',
-  password: process.env.POSTGRES_PASSWORD ?? '',
+  host: env.POSTGRES_HOST,
+  port: env.POSTGRES_PORT,
+  database: env.POSTGRES_DB,
+  username: env.POSTGRES_USER,
+  password: env.POSTGRES_PASSWORD,
   logging: false,
   models: [
     UserModel,
