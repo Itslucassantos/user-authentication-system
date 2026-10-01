@@ -731,7 +731,18 @@ Refresh tokens are **Redis-only** (a former `refresh_tokens` table was dropped b
 
 ## Running with Docker
 
-`docker-compose.yml` starts **PostgreSQL 17** and **Redis 8** for local development (the API itself runs on the host with `npm run dev`).
+`docker-compose.yml` starts the **whole stack** with a single command:
+
+```bash
+cp .env.example .env   # set POSTGRES_PASSWORD, JWT_ACCESS_SECRET, ADMIN_EMAIL (and drop MAIL_* to use the console mailer)
+docker compose up -d --build
+```
+
+Services: `postgres` (17), `redis` (8, protected by `REDIS_PASSWORD` when set), `setup` (one-shot: runs the migrations and the idempotent admin seed, then exits) and `api` (starts after `setup` succeeds; GraphQL at `http://localhost:3000/graphql`, health at `/health`). `POSTGRES_HOST` and `REDIS_HOST` are overridden to the service names inside the containers, so the same `.env` also works for `npm run dev` on the host.
+
+Useful commands: `docker compose logs setup` (prints the admin `clientId`/`clientSecret` and generated password once), `docker compose logs -f api`, `docker compose down` (add `-v` to wipe the data).
+
+To run only the databases and the API on the host, use `docker compose up -d postgres redis` followed by `npm run dev`.
 
 The **`Dockerfile`** builds a multi-stage production image (Node 24 Alpine, production dependencies only, non-root user):
 

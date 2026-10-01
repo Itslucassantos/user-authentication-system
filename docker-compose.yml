@@ -22,16 +22,61 @@ services:
     image: redis:8-alpine
     container_name: user-auth-redis
     restart: unless-stopped
-    command: ['redis-server', '--appendonly', 'yes']
+    command: ['redis-server', '--appendonly', 'yes', '--requirepass', '${REDIS_PASSWORD:-}']
     ports:
       - '${REDIS_PORT:-6379}:6379'
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
     volumes:
       - redis-data:/data
     healthcheck:
-      test: ['CMD', 'redis-cli', 'ping']
+      test: ['CMD-SHELL', 'redis-cli -a "$$REDIS_PASSWORD" --no-auth-warning ping | grep -q PONG']
       interval: 10s
       timeout: 5s
       retries: 5
+
+  # One-shot job: applies the migrations and seeds the first admin (idempotent), then exits.
+  setup:
+    build: .
+    image: user-authentication-system
+    container_name: user-auth-setup
+    restart: 'no'
+    command:
+      - sh
+      - -c
+      - node dist/infrastructure/database/migrate.js up && node dist/infrastructure/database/seed-admin.js
+    env_file: .env
+    environment:
+      POSTGRES_HOST: postgres
+      REDIS_HOST: redis
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api:
+    build: .
+    image: user-authentication-system
+    container_name: user-auth-api
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      # NODE_ENV=development keeps CORS open and allows the console mailer for local testing
+      NODE_ENV: development
+      POSTGRES_HOST: postgres
+      REDIS_HOST: redis
+    ports:
+      - '${PORT:-3000}:${PORT:-3000}'
+    depends_on:
+      setup:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -qO- http://localhost:$${PORT:-3000}/health || exit 1']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
 
 volumes:
   postgres-data:
