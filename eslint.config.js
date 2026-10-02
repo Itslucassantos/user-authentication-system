@@ -7,4 +7,17 @@ export default [
   },
   eslint.configs.recommended,
   prettier,
+  {
+    // Node CommonJS helpers (Jest transformer and integration setup)
+    files: ['**/*.cjs'],
+    languageOptions: {
+      sourceType: 'commonjs',
+      globals: {
+        require: 'readonly',
+        module: 'writable',
+        process: 'readonly',
+        __filename: 'readonly',
+      },
+    },
+  },
 ];
