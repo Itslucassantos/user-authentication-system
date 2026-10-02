@@ -22,6 +22,7 @@ const envSchema = z
 
     REDIS_HOST: z.string().min(1).default('localhost'),
     REDIS_PORT: port.default(6379),
+    REDIS_DB: z.coerce.number().int().min(0).default(0),
     REDIS_PASSWORD: z.string().min(1).optional(),
 
     JWT_ACCESS_SECRET: z.string().min(32, 'JWT_ACCESS_SECRET must have at least 32 characters'),
