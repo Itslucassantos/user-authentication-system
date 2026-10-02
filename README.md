@@ -27,7 +27,6 @@ Built with **Node.js 24, TypeScript, Express 5, Apollo Server, PostgreSQL and Re
 - [Running with Docker](#running-with-docker)
 - [Testing and code quality](#testing-and-code-quality)
 - [Continuous integration](#continuous-integration)
-- [Known limitations and roadmap](#known-limitations-and-roadmap)
 - [License](#license)
 
 ---
@@ -502,6 +501,7 @@ All variables are validated with **zod** at startup (`src/infrastructure/config/
 | `POSTGRES_PASSWORD`                 |  yes\*   | empty         | Database password. \*Required by `docker-compose.yml`.                                                        |
 | `REDIS_HOST`                        |    —     | `localhost`   | Redis host.                                                                                                   |
 | `REDIS_PORT`                        |    —     | `6379`        | Redis port.                                                                                                   |
+| `REDIS_DB`                          |    —     | `0`           | Redis logical database index (the integration tests use `15`).                                                |
 | `REDIS_PASSWORD`                    |    —     | unset         | Redis password, if any.                                                                                       |
 | `JWT_ACCESS_SECRET`                 |   yes    | —             | HS256 signing secret, **minimum 32 characters**.                                                              |
 | `JWT_ACCESS_TTL`                    |    —     | `15m`         | Access token lifetime.                                                                                        |
@@ -542,6 +542,7 @@ Variables read **only by the seed script** (`npm run seed:admin`):
 | `npm test`                  | Run the unit test suite (Jest). No external services required.           |
 | `npm run test:watch`        | Run Jest in watch mode.                                                  |
 | `npm run test:coverage`     | Run Jest with a coverage report (`coverage/`).                           |
+| `npm run test:integration`  | Run the integration suite (needs PostgreSQL and Redis running).          |
 | `npm run migrate`           | Apply all pending migrations.                                            |
 | `npm run migrate:down`      | Revert the last migration.                                               |
 | `npm run migrate:pending`   | List pending migrations.                                                 |
@@ -791,9 +792,34 @@ Conventions:
 
 Jest details (`jest.config.mjs`): `src/**/*.spec.ts` are matched; `.js` import extensions are mapped back to `.ts`; `uuid` and `jose` (ESM-only) go through Babel. Coverage is collected only for layers testable without infrastructure.
 
-### Not covered by automated tests yet
+### Integration tests
 
-These need real PostgreSQL / Redis and belong to a future **integration** suite (for example `*.int-spec.ts` with Supertest and `docker-compose`): Sequelize and Redis repositories, `RedisRateLimiter`, mailers, migrations, GraphQL resolvers and directives, and cross-tenant access through the HTTP API (currently validated manually).
+`npm run test:integration` runs `*.int-spec.ts` files against **real PostgreSQL and Redis** (start them with `docker compose up -d postgres redis`). It is separate from `npm test`, which stays infrastructure-free.
+
+```bash
+docker compose up -d postgres redis
+npm run test:integration
+```
+
+**Your development data is never touched.** The suite uses its own database (`<POSTGRES_DB>_test`, created and migrated automatically by the Jest global setup) and Redis DB `15`; the helpers that wipe data refuse to run against anything else. Connection settings come from `.env` or the environment, like the app.
+
+| Area                                 | What is covered                                                                                                                                            |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Sequelize repositories**           | CRUD, unique constraints per tenant, FK `RESTRICT` / `CASCADE`, role/permission replacement, pagination, tenant-scoped listing, not-found errors.          |
+| **Redis** (`RefreshTokenRepository`) | TTL, atomic Lua update (only active tokens), revoke keeping the TTL, `deleteAllByUserId`.                                                                  |
+| **Redis** (`RedisRateLimiter`)       | Counting, block after the limit, `retryAfter`, per-key isolation, `reset`.                                                                                 |
+| **Migrations**                       | All applied, same recorded names from `.ts` and `.js`, schema present, `down` + `up` through the `migrate` CLI.                                            |
+| **GraphQL over HTTP (Supertest)**    | Login, refresh rotation and reuse detection, logout, rate limits, invitation / `setPassword`, password reset, user management, `@auth` / `@authenticated`. |
+| **Multi-tenant isolation**           | Every cross-tenant read and write path (`FORBIDDEN`, `null`, `NOT_FOUND`) and the default scoping.                                                         |
+
+How it works:
+
+- **Real stack, one stub.** The app's own container and Apollo server are used. Only `NodemailerMailer` is replaced by an in-memory `CapturedMailer`, so tests read the invitation / reset tokens that would have been emailed.
+- **Isolation between tests.** Every test starts from truncated tables and a flushed Redis DB (`resetState`); files run serially (`maxWorkers: 1`) because they share the database.
+- **Transformer.** Sequelize models use legacy decorators on `declare` fields, which Babel rejects, so this suite compiles with esbuild (`jest.esbuild-transform.cjs`) instead; unit tests keep using Babel.
+- Helpers live in `src/@testing/integration/` (`useIntegrationInfrastructure`, `createTenant`, `createGraphQLApp` / `gql`).
+
+Not covered: the real SMTP transport (`NodemailerMailer`) and the `/health` endpoint in `main.ts`.
 
 ### Code quality
 
@@ -813,19 +839,7 @@ GitHub Actions (`.github/workflows/ci.yaml`) runs on every push and pull request
 2. ESLint
 3. TypeScript type check
 4. Jest (unit tests)
-
-Integration tests are not part of the pipeline yet.
-
----
-
-## Known limitations and roadmap
-
-- [ ] **No integration tests yet.** Domain and application layers have unit tests, but repositories (PostgreSQL / Redis), rate limiter, GraphQL resolvers and cross-tenant access through the HTTP API are still validated manually. See [Not covered by automated tests yet](#not-covered-by-automated-tests-yet).
-- **Refresh token reuse has no grace window**: a client that resends an already-rotated refresh token (e.g. two tabs out of sync) causes all its sessions to be terminated.
-- **Permission changes are not instant**: authorization comes from the access token, so changes apply at the next refresh or login.
-- **Frontend pages are out of scope**: the `/set-password` and `/reset-password` pages referenced in emails must be provided by a client application.
-- **Refresh token TTL is fixed at 30 days** (constant in the domain factory), unlike the access token TTL, which is configurable.
-- **`ClientApplication` operations are not tenant-scoped** by design (see [Multi-tenant isolation](#multi-tenant-isolation)).
+5. Integration tests, in a separate `integration` job with PostgreSQL 17 and Redis 8 service containers
 
 ---
 
